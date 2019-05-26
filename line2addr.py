@@ -27,11 +27,10 @@ def get_lines(binary, base_address=0x0):
         files = lp['file_entry']
         directories = ["."] + [str(d, 'utf8') for d in lp['include_directory']]
         for lpe in lp.get_entries():
-            print(lpe)
             if lpe.state:
                 lfile = files[lpe.state.file-1]
                 (lines[(directories[lfile['dir_index']], str(lfile['name'], 'utf8'))]
-                    [lpe.state.line].append(lpe.state.address+base_address))
+                    [lpe.state.line].append((lpe.command, lpe.state.address+base_address)))
     return lines
 
 def display_file_line(filename, lineno, lines):
@@ -54,11 +53,12 @@ def display_file(filename, lines):
             for lineno, line in enumerate(srcfile.readlines(), 1):
                 if lineno in lines[reffile]:
                     addresses = lines[reffile][lineno]
-                    print("{} {} {}".format(yellownum(lineno, 3), redhex(addresses[0], 8), line[:-1]))
-                    for i, addr in enumerate(addresses[1:], 1):
-                        print("{:3} {}".format("", redhex(addr, 8)))
+                    opcode, addr = addresses[0]
+                    print("{} {:3} {} {}".format(yellownum(lineno, 3), opcode, redhex(addr, 8), line[:-1]))
+                    for i, (opcode, addr) in enumerate(addresses[1:], 1):
+                        print("{:3} {:3} {}".format("", opcode, redhex(addr, 8)))
                 else:
-                    print("{} {:8} {}".format(yellownum(lineno, 3), '', line[:-1]))
+                    print("{} {:3} {:8} {}".format(yellownum(lineno, 3), '', '', line[:-1]))
         else:
             print("{} is not references in the executable".format(filename))
 
@@ -88,7 +88,7 @@ def main():
         print(json.dumps(
             {
                 "{}/{}".format(key[0], key[1]) : {
-                    lineno : list(map(hex, lines[key][lineno]))
+                    lineno : [[cmd_addr[0], hex(cmd_addr[1])] for cmd_addr in lines[key][lineno]]
                     for lineno in lines[key]
                 }
                 for key in lines

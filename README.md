@@ -9,10 +9,10 @@ Special thanks out to the fantastic [`pyelftools`](https://github.com/eliben/pye
 library written by [Eli Bendersky](https://github.com/eliben/).
 
 ## TODO / Limitations
-Being extremely naive and careless in labelling. I'm still figuring out what everything
-means in the `LineProgramEntry` format and don't know basic stuff like "What does
-`end_sequence` mean?". So the multiple entries for some lines may not be correct. :(
-
+Being extremely naive and careless in labelling. Currently, regardless of the opcode
+type for a given `LineProgramEntry` I just dump the address in. This means that opcodes
+that are actually providing a return address are being associated with the same line.
+ 
 ## Current features
 ### Display all addresses for a file
 ```
