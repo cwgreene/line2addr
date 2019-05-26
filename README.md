@@ -1,9 +1,13 @@
 ## line2addr
 
 The standard tool `addr2line` converts an address from a binary to a line
-in a file using debug information. This tool `line2addr` converts a line
+in a file using DWARF debug information. This tool `line2addr` converts a line
 into an address. It can also report all the addresses associated with
 all the lines in a json representation.
+
+Special thanks out to the fantastic [https://github.com/eliben/pyelftools pyelftools]
+library written by [https://github.com/eliben/ Eli Bendersky].
+
 
 ## Current features
 ### Display all addresses for a file
