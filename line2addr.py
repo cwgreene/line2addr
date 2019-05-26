@@ -72,12 +72,18 @@ def normalize_hex(hexstring):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--binary", "-b", required=True)
-    parser.add_argument("--json-db", "-j", action="store_true")
-    parser.add_argument("--file", "-f")
-    parser.add_argument("--directory", "-d")
-    parser.add_argument("--line", "-l", type=int)
-    parser.add_argument("--base-address", "-a", default='0x0')
+    parser.add_argument("--binary", "-b", required=True,
+        help="binary to resolve addresses for")
+    parser.add_argument("--json-db", "-j", action="store_true",
+        help="dump DWARF database to json output (WIP)")
+    parser.add_argument("--file", "-f",
+        help="print addresses for target FILE")
+    parser.add_argument("--line", "-l", type=int,
+        help="print address for target LINE instead (also needs FILE)")
+    parser.add_argument("--directory", "-d",
+        help="print addresses for all files provided src root DIRECTORY")
+    parser.add_argument("--base-address", "-a", default='0x0',
+        help="add BASE_ADDRESS to all addresses")
     options = parser.parse_args()
 
     base_address = normalize_hex(options.base_address)
