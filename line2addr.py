@@ -1,8 +1,9 @@
 import argparse
-import colorama
 import os
 
 from collections import defaultdict as dd
+
+import colorama
 
 import elftools.elf.elffile as elf
 
@@ -22,12 +23,12 @@ def get_lines(binary):
         for lpe in lp.get_entries():
             if lpe.state:
                 lfile = files[lpe.state.file-1]
-                lines [(lfile['dir_index'], lfile['name'])][lpe.state.line].append(lpe.state.address)
+                lines [(lfile['dir_index'], str(lfile['name'],'utf8'))][lpe.state.line].append(lpe.state.address)
     return lines
 
 def display_file_line(filename, lineno, lines):
     referenced_files = {pair[1]:(pair[0],pair[1]) for pair in lines}
-    bf = bytes(os.path.basename(filename), 'utf8')
+    bf = os.path.basename(filename)
     reffile = referenced_files.get(bf, None)
     if reffile:
         for addr in lines[reffile][lineno]:
@@ -37,7 +38,7 @@ def display_file_line(filename, lineno, lines):
 
 def display_file(filename, lines):
     referenced_files = {pair[1]:(pair[0],pair[1]) for pair in lines}
-    bf = bytes(os.path.basename(filename), 'utf8')
+    bf = os.path.basename(filename)
 
     with open(filename) as srcfile:
         reffile = referenced_files.get(bf, None)
