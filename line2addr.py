@@ -25,6 +25,16 @@ def get_lines(binary):
                 lines [(lfile['dir_index'], lfile['name'])][lpe.state.line].append(lpe.state.address)
     return lines
 
+def display_file_line(filename, lineno, lines):
+    referenced_files = {pair[1]:(pair[0],pair[1]) for pair in lines}
+    bf = bytes(os.path.basename(filename), 'utf8')
+    reffile = referenced_files.get(bf, None)
+    if reffile:
+        for addr in lines[reffile][lineno]:
+            print(hex(addr))
+    else:
+        print("{} is not references in the executable".format(filename))
+
 def display_file(filename, lines):
     referenced_files = {pair[1]:(pair[0],pair[1]) for pair in lines}
     bf = bytes(os.path.basename(filename), 'utf8')
@@ -46,12 +56,16 @@ def display_file(filename, lines):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file", "-f")
     parser.add_argument("--binary", "-b", required=True)
+    parser.add_argument("--file", "-f")
+    parser.add_argument("--line", "-l", type=int)
+    parser.add_argument("--display-file", "-d", action="store_true")
     options = parser.parse_args()
 
     with open(options.binary, "rb") as binary:
         lines = get_lines(binary)
-    if options.file:
+    if options.file and options.line:
+        display_file_line(options.file, options.line, lines)
+    if options.file and options.display_file:
         display_file(options.file, lines)
 main()
