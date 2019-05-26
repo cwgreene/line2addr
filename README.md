@@ -32,7 +32,7 @@ $ line2addr.py -b binaries/test -f binaries/test.c -l 10
 ```
 ### Dump line database as json
 ```
-line2addr.py -b binaries/test -j | jq .
+$ line2addr.py -b binaries/test -j | jq .
 {
   "./test.c": {
     "5": [
