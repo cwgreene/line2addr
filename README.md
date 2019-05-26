@@ -116,3 +116,21 @@ binaries/dirtest/test2.c:
   4      680 }
          683
 ```
+
+### See additional DWARF information
+```
+$ line2addr.py -b binaries/test2 -d ./binaries/ --dwarf
+./binaries/dirtest/test.c:
+  1              #include "test2.h"
+  2
+  3  20      64a int main() {
+  4  75      64e     g(3);
+  5 229      65d }
+      1      65f
+./binaries/dirtest/test2.c:
+  1              #include <stdio.h>
+  2  19      65f int g(int x) {
+  3 173      66a     printf("%d\n", x);
+  4  89      680 }
+      1      683
+```

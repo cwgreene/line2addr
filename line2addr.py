@@ -10,9 +10,13 @@ import colorama
 import elftools.elf.elffile as elf
 
 def redhex(num, padding):
+    if num == '':
+        return ' '*padding
     return colorama.Fore.RED + ("{:"+str(padding)+"x}").format(num)+ colorama.Fore.RESET
 
 def yellownum(num, padding):
+    if num == '':
+        return ' '*padding
     return colorama.Fore.YELLOW + ("{:" + str(padding) + "d}").format(num) + colorama.Fore.RESET
 
 def green(string):
@@ -43,7 +47,21 @@ def display_file_line(filename, lineno, lines):
     else:
         print("{} is not references in the executable".format(filename))
 
-def display_file(filename, lines):
+def print_line(**kwargs):
+    if kwargs['options']['display_dwarf']:
+        print("{} {:3} {} {}".format(
+            yellownum(kwargs['lineno'], 3),
+            kwargs['opcode'],
+            redhex(kwargs['addr'], 8),
+            kwargs['line']))
+    else:
+        print("{} {} {}".format(
+            yellownum(kwargs['lineno'], 3),
+            redhex(kwargs['addr'], 8),
+            kwargs['line']))
+
+
+def display_file(filename, lines, display_options):
     referenced_files = {pair[1]:(pair[0],pair[1]) for pair in lines}
     bf = os.path.basename(filename)
 
@@ -54,11 +72,11 @@ def display_file(filename, lines):
                 if lineno in lines[reffile]:
                     addresses = lines[reffile][lineno]
                     opcode, addr = addresses[0]
-                    print("{} {:3} {} {}".format(yellownum(lineno, 3), opcode, redhex(addr, 8), line[:-1]))
+                    print_line(lineno=lineno, opcode=opcode, addr=addr, line=line[:-1], options=display_options)
                     for i, (opcode, addr) in enumerate(addresses[1:], 1):
-                        print("{:3} {:3} {}".format("", opcode, redhex(addr, 8)))
+                        print_line(lineno='', opcode=opcode, addr=addr, line='', options=display_options)
                 else:
-                    print("{} {:3} {:8} {}".format(yellownum(lineno, 3), '', '', line[:-1]))
+                    print_line(lineno=lineno, opcode='', addr='', line=line[:-1], options=display_options)
         else:
             print("{} is not references in the executable".format(filename))
 
@@ -84,9 +102,13 @@ def main():
         help="print addresses for all files provided src root DIRECTORY")
     parser.add_argument("--base-address", "-a", default='0x0',
         help="add BASE_ADDRESS to all addresses")
+    parser.add_argument("--dwarf", action="store_true",
+        help="display additional DWARF information for lines")
     options = parser.parse_args()
 
     base_address = normalize_hex(options.base_address)
+
+    display_options = {"display_dwarf": options.dwarf }
 
     with open(options.binary, "rb") as binary:
         lines = get_lines(binary, base_address)
@@ -102,11 +124,11 @@ def main():
     if options.file and options.line:
         display_file_line(options.file, options.line, lines)
     if options.file and not options.line:
-        display_file(options.file, lines)
+        display_file(options.file, lines, display_options)
     if options.directory:
         for srcfile in lines:
             fullsrcpath = os.path.join(srcfile[0], srcfile[1])
             fullpath = os.path.join(options.directory, fullsrcpath)
             print(green(fullpath + ":"))
-            display_file(fullpath, lines)
+            display_file(fullpath, lines, display_options)
 main()
