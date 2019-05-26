@@ -22,10 +22,12 @@ def get_lines(binary):
     for cu in dwarf.iter_CUs():
         lp = dwarf.line_program_for_CU(cu)
         files = lp['file_entry']
+        directories = ["."] + [str(d, 'utf8') for d in lp['include_directory']]
         for lpe in lp.get_entries():
             if lpe.state:
                 lfile = files[lpe.state.file-1]
-                lines [(lfile['dir_index'], str(lfile['name'],'utf8'))][lpe.state.line].append(lpe.state.address)
+                (lines[(directories[lfile['dir_index']], str(lfile['name'], 'utf8'))]
+                    [lpe.state.line].append(lpe.state.address))
     return lines
 
 def display_file_line(filename, lineno, lines):
@@ -71,7 +73,7 @@ def main():
     if options.json_db:
         print(json.dumps(
             {
-                "({},{})".format(key[0], key[1]) : {
+                "{}/{}".format(key[0], key[1]) : {
                     lineno : list(map(hex, lines[key][lineno]))
                     for lineno in lines[key]
                 }

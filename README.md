@@ -34,7 +34,7 @@ $ line2addr.py -b binaries/test -f binaries/test.c -l 10
 ```
 line2addr.py -b binaries/test -j | jq .
 {
-  "(0,test.c)": {
+  "./test.c": {
     "5": [
       "0x78a",
       "0x799"
