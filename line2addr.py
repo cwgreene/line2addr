@@ -15,6 +15,9 @@ def redhex(num, padding):
 def yellownum(num, padding):
     return colorama.Fore.YELLOW + ("{:" + str(padding) + "d}").format(num) + colorama.Fore.RESET
 
+def green(string):
+    return colorama.Fore.LIGHTGREEN_EX + string + colorama.Fore.RESET
+
 def get_lines(binary, base_address=0x0):
     belf = elf.ELFFile(binary)
     dwarf = belf.get_dwarf_info()
@@ -71,6 +74,7 @@ def main():
     parser.add_argument("--binary", "-b", required=True)
     parser.add_argument("--json-db", "-j", action="store_true")
     parser.add_argument("--file", "-f")
+    parser.add_argument("--directory", "-d")
     parser.add_argument("--line", "-l", type=int)
     parser.add_argument("--base-address", "-a", default='0x0')
     options = parser.parse_args()
@@ -92,4 +96,10 @@ def main():
         display_file_line(options.file, options.line, lines)
     if options.file and not options.line:
         display_file(options.file, lines)
+    if options.directory:
+        for srcfile in lines:
+            fullsrcpath = os.path.join(srcfile[0], srcfile[1])
+            fullpath = os.path.join(options.directory, fullsrcpath)
+            print(green(fullpath + ":"))
+            display_file(fullpath, lines)
 main()

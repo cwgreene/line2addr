@@ -95,4 +95,20 @@ $ line2addr.py -b binaries/test -a 0x400000 -f binaries/test.c
       40083a
 
 ```
-
+### Use a base directory and display all files
+```
+$ ./line2addr.py -d binaries/ -b binaries/test2
+binaries/dirtest/test.c:
+  1          #include "test2.h"
+  2          
+  3      64a int main() {
+  4      64e     g(3);
+  5      65d }
+         65f
+binaries/dirtest/test2.c:
+  1          #include <stdio.h>
+  2      65f int g(int x) {
+  3      66a     printf("%d\n", x);
+  4      680 }
+         683
+```
