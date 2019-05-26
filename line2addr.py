@@ -72,11 +72,10 @@ def main():
     parser.add_argument("--json-db", "-j", action="store_true")
     parser.add_argument("--file", "-f")
     parser.add_argument("--line", "-l", type=int)
-    parser.add_argument("--display-file", "-d", action="store_true")
     parser.add_argument("--base-address", "-a", default='0x0')
     options = parser.parse_args()
 
-    base_address = normalize_hex(options.base_address[2:])
+    base_address = normalize_hex(options.base_address)
 
     with open(options.binary, "rb") as binary:
         lines = get_lines(binary, base_address)
@@ -91,6 +90,6 @@ def main():
             }))
     if options.file and options.line:
         display_file_line(options.file, options.line, lines)
-    if options.file and options.display_file:
+    if options.file and not options.line:
         display_file(options.file, lines)
 main()

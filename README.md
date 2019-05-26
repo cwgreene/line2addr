@@ -12,7 +12,7 @@ library written by [Eli Bendersky](https://github.com/eliben/).
 ## Current features
 ### Display all addresses for a file
 ```
-$ line2addr.py -b binaries/test -f binaries/test.c -d
+$ line2addr.py -b binaries/test -f binaries/test.c
   1          #include <unistd.h>
   2          #include <stdio.h>
   3          #include <string.h>
