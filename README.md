@@ -5,7 +5,7 @@ in a file using DWARF debug information. This tool `line2addr` converts a line
 into an address. It can also report all the addresses associated with
 all the lines in a json representation.
 
-Special thanks out to the fantastic [pyelftools](https://github.com/eliben/pyelftools)
+Special thanks out to the fantastic [`pyelftools`](https://github.com/eliben/pyelftools)
 library written by [Eli Bendersky](https://github.com/eliben/).
 
 
