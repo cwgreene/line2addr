@@ -1,7 +1,9 @@
 ## line2addr
 
-`addr2line` converts a address from a binary to a line in a file using debug information. This
-converts a line in a 
+The standard tool `addr2line` converts a address from a binary to a line
+in a file using debug information. This tool `line2addr` converts a line
+into an address. It can also report all the addresses associated with
+all the lines in a json representation.
 
 ## Current features
 ### Display all addresses for a file
