@@ -15,7 +15,7 @@ def redhex(num, padding):
 def yellownum(num, padding):
     return colorama.Fore.YELLOW + ("{:" + str(padding) + "d}").format(num) + colorama.Fore.RESET
 
-def get_lines(binary):
+def get_lines(binary, base_address=0x0):
     belf = elf.ELFFile(binary)
     dwarf = belf.get_dwarf_info()
     lines = dd(lambda: dd(lambda:[]))
@@ -27,7 +27,7 @@ def get_lines(binary):
             if lpe.state:
                 lfile = files[lpe.state.file-1]
                 (lines[(directories[lfile['dir_index']], str(lfile['name'], 'utf8'))]
-                    [lpe.state.line].append(lpe.state.address))
+                    [lpe.state.line].append(lpe.state.address+base_address))
     return lines
 
 def display_file_line(filename, lineno, lines):
@@ -58,6 +58,13 @@ def display_file(filename, lines):
         else:
             print("{} is not references in the executable".format(filename))
 
+def normalize_hex(hexstring):
+    hs = hexstring
+    if hexstring.startswith("0"):
+        hs = hexstring[2:]
+    elif hexstring.startswith("x"):
+        hs = hexstring[1:]
+    return int(hs, 16)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -66,10 +73,13 @@ def main():
     parser.add_argument("--file", "-f")
     parser.add_argument("--line", "-l", type=int)
     parser.add_argument("--display-file", "-d", action="store_true")
+    parser.add_argument("--base-address", "-a", default='0x0')
     options = parser.parse_args()
 
+    base_address = normalize_hex(options.base_address[2:])
+
     with open(options.binary, "rb") as binary:
-        lines = get_lines(binary)
+        lines = get_lines(binary, base_address)
     if options.json_db:
         print(json.dumps(
             {

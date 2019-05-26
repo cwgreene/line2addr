@@ -73,4 +73,26 @@ $ line2addr.py -b binaries/test -j | jq .
   }
 }
 ```
+### Use an base address offset (WIP)
+```
+$ line2addr.py -b binaries/test -a 0x400000 -f binaries/test.c
+  1          #include <unistd.h>
+  2          #include <stdio.h>
+  3          #include <string.h>
+  4          int x[100];
+  5   40078a int main(int argc, char **argv) {
+      400799
+  6              char bob[10];
+  7   4007a8     memset(bob,0,sizeof(bob));
+  8   4007be     read(0, bob, 9);
+  9   4007d4     bob[9]=0;
+ 10   4007d8     if(strcmp(bob, "hello") == 0) {
+ 11   4007ef         printf("hi");
+ 12   400800         return 1;
+ 13              }
+ 14   400807     printf("%s", bob);
+ 15   400824 }
+      40083a
+
+```
 
