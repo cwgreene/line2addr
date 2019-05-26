@@ -30,4 +30,41 @@ $ line2addr.py -b binaries/test -f binaries/test.c -d
 $ line2addr.py -b binaries/test -f binaries/test.c -l 10
 0x7d8
 ```
+### Dump line database as json
+```
+line2addr.py -b binaries/test -f binaries/test.c -j | jq .
+{
+  "(0,test.c)": {
+    "5": [
+      "0x78a",
+      "0x799"
+    ],
+    "7": [
+      "0x7a8"
+    ],
+    "8": [
+      "0x7be"
+    ],
+    "9": [
+      "0x7d4"
+    ],
+    "10": [
+      "0x7d8"
+    ],
+    "11": [
+      "0x7ef"
+    ],
+    "12": [
+      "0x800"
+    ],
+    "14": [
+      "0x807"
+    ],
+    "15": [
+      "0x824",
+      "0x83a"
+    ]
+  }
+}
+```
 

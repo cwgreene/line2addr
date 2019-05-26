@@ -1,4 +1,6 @@
+#!/usr/bin/env python3
 import argparse
+import json
 import os
 
 from collections import defaultdict as dd
@@ -58,6 +60,7 @@ def display_file(filename, lines):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--binary", "-b", required=True)
+    parser.add_argument("--json-db", "-j", action="store_true")
     parser.add_argument("--file", "-f")
     parser.add_argument("--line", "-l", type=int)
     parser.add_argument("--display-file", "-d", action="store_true")
@@ -65,6 +68,15 @@ def main():
 
     with open(options.binary, "rb") as binary:
         lines = get_lines(binary)
+    if options.json_db:
+        print(json.dumps(
+            {
+                "({},{})".format(key[0], key[1]) : {
+                    lineno : list(map(hex, lines[key][lineno]))
+                    for lineno in lines[key]
+                }
+                for key in lines
+            }))
     if options.file and options.line:
         display_file_line(options.file, options.line, lines)
     if options.file and options.display_file:
