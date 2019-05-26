@@ -8,6 +8,10 @@ all the lines in a json representation.
 Special thanks out to the fantastic [`pyelftools`](https://github.com/eliben/pyelftools)
 library written by [Eli Bendersky](https://github.com/eliben/).
 
+## TODO / Limitations
+Being extremely naive and careless in labelling. I'm still figuring out what everything
+means in the `LineProgramEntry` format and don't know basic stuff like "What does
+`end_sequence` mean?". So the multiple entries for some lines may not be correct. :(
 
 ## Current features
 ### Display all addresses for a file

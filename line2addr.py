@@ -27,6 +27,7 @@ def get_lines(binary, base_address=0x0):
         files = lp['file_entry']
         directories = ["."] + [str(d, 'utf8') for d in lp['include_directory']]
         for lpe in lp.get_entries():
+            print(lpe)
             if lpe.state:
                 lfile = files[lpe.state.file-1]
                 (lines[(directories[lfile['dir_index']], str(lfile['name'], 'utf8'))]
