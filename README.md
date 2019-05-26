@@ -1,17 +1,23 @@
 ## line2addr
 
-The standard tool `addr2line` converts an address from a binary to a line
-in a file using DWARF debug information. This tool `line2addr` converts a line
-into an address. It can also report all the addresses associated with
-all the lines in a json representation.
+The standard tool `addr2line` converts an address from a binary to a
+line in a file using DWARF debug information. This tool `line2addr`
+converts a line into an address. It can also report all the addresses
+associated with all the lines in a json representation.
 
 Special thanks out to the fantastic [`pyelftools`](https://github.com/eliben/pyelftools)
 library written by [Eli Bendersky](https://github.com/eliben/).
 
 ## TODO / Limitations
-Being extremely naive and careless in labelling. Currently, regardless of the opcode
-type for a given `LineProgramEntry` I just dump the address in. This means that opcodes
-that are actually providing a return address are being associated with the same line.
+Being extremely naive and careless in labelling. Currently, regardless
+of the opcode type for a given `LineProgramEntry` I just dump the address
+in. This means that opcodes that are actually providing a return address
+are being associated with the same line.
+
+Fortunately, `pyelftools` has already done most of the heavy lifting
+(i.e. read the spec) here and has already implemented the state
+machine transitions, which is captured in the `state` object of the
+`LineProgramEntry`.
  
 ## Current features
 ### Display all addresses for a file
