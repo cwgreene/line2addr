@@ -3,7 +3,7 @@ import argparse
 import json
 import os
 
-from collections import defaultdict as dd
+from collections import defaultdict
 
 import colorama
 
@@ -23,9 +23,9 @@ def green(string):
     return colorama.Fore.LIGHTGREEN_EX + string + colorama.Fore.RESET
 
 def get_lines(binary, base_address=0x0):
-    belf = elf.ELFFile(binary)
-    dwarf = belf.get_dwarf_info()
-    lines = dd(lambda: dd(lambda:[]))
+    elf_binary = elf.ELFFile(binary)
+    dwarf = elf_binary.get_dwarf_info()
+    lines = defaultdict(lambda: defaultdict(lambda:[]))
     for cu in dwarf.iter_CUs():
         lp = dwarf.line_program_for_CU(cu)
         files = lp['file_entry']
@@ -38,6 +38,7 @@ def get_lines(binary, base_address=0x0):
     return lines
 
 def display_file_line(filename, lineno, lines):
+    # Also needs to be fixed here
     referenced_files = {pair[1]:(pair[0],pair[1]) for pair in lines}
     bf = os.path.basename(filename)
     reffile = referenced_files.get(bf, None)
@@ -60,13 +61,39 @@ def print_line(**kwargs):
             redhex(kwargs['addr'], 8),
             kwargs['line']))
 
+def resolve_file(dirname, basename, lookup):
+    """
+    If a filename is unique, use it. If it is not,
+    check the parent directories until disambiguation is achieved.
+    """
+    if basename not in lookup:
+        return None
+    reference_list = lookup[basename]
+    dirname_path = os.path.split(dirname)
+    matches = [(os.path.split(match[0]), match[0], match[1]) for match in reference_list]
+    while matches:
+        matches = [(os.path.split(match[0][0]), match[1], match[2]) for match in matches
+            if os.path.normpath(match[0][-1]) == os.path.normpath(dirname_path[-1])]
+        dirname_path = os.path.split(dirname_path[0])
+        if len(matches) == 1:
+            return (matches[0][1], matches[0][2])
+    return None
+
+def construct_reference_lookup(lines):
+    lookup = defaultdict(lambda: [])
+    for (directory, name) in lines:
+        lookup[name].append((directory, name))
+    return lookup
 
 def display_file(filename, lines, display_options):
-    referenced_files = {pair[1]:(pair[0],pair[1]) for pair in lines}
-    bf = os.path.basename(filename)
+    # This is the main issue
+    referenced_files = construct_reference_lookup(lines)
+    abspath = os.path.abspath(filename)
+    dirname = os.path.dirname(abspath)
+    basename = os.path.basename(abspath)
 
     with open(filename) as srcfile:
-        reffile = referenced_files.get(bf, None)
+        reffile = resolve_file(dirname, basename, referenced_files)
         if reffile:
             for lineno, line in enumerate(srcfile.readlines(), 1):
                 if lineno in lines[reffile]:
@@ -78,7 +105,7 @@ def display_file(filename, lines, display_options):
                 else:
                     print_line(lineno=lineno, opcode='', addr='', line=line[:-1], options=display_options)
         else:
-            print("{} is not references in the executable".format(filename))
+            print("{} is not referenced in the executable".format(filename))
 
 def normalize_hex(hexstring):
     hs = hexstring
