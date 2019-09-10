@@ -10,14 +10,14 @@ library written by [Eli Bendersky](https://github.com/eliben/).
 
 ## Current features
 ### Display all addresses for a file
-```
+```test
 $ line2addr.py -b binaries/test -f binaries/test.c
   1          #include <unistd.h>
   2          #include <stdio.h>
   3          #include <string.h>
   4          int x[100];
   5      78a int main(int argc, char **argv) {
-         799
+         799 
   6              char bob[10];
   7      7a8     memset(bob,0,sizeof(bob));
   8      7be     read(0, bob, 9);
@@ -28,59 +28,92 @@ $ line2addr.py -b binaries/test -f binaries/test.c
  13              }
  14      807     printf("%s", bob);
  15      824 }
-         83a
+         83a 
 ```
 ### Display all addresses for a specific line in a file
-```
+```test
 $ line2addr.py -b binaries/test -f binaries/test.c -l 10
 0x7d8
 ```
 ### Dump line database as json
-```
+```test
 $ line2addr.py -b binaries/test -j | jq .
 {
   "./test.c": {
     "5": [
-      "0x78a",
-      "0x799"
+      [
+        22,
+        "0x78a"
+      ],
+      [
+        228,
+        "0x799"
+      ]
     ],
     "7": [
-      "0x7a8"
+      [
+        230,
+        "0x7a8"
+      ]
     ],
     "8": [
-      "0x7be"
+      [
+        89,
+        "0x7be"
+      ]
     ],
     "9": [
-      "0x7d4"
+      [
+        89,
+        "0x7d4"
+      ]
     ],
     "10": [
-      "0x7d8"
+      [
+        75,
+        "0x7d8"
+      ]
     ],
     "11": [
-      "0x7ef"
+      [
+        103,
+        "0x7ef"
+      ]
     ],
     "12": [
-      "0x800"
+      [
+        19,
+        "0x800"
+      ]
     ],
     "14": [
-      "0x807"
+      [
+        118,
+        "0x807"
+      ]
     ],
     "15": [
-      "0x824",
-      "0x83a"
+      [
+        187,
+        "0x824"
+      ],
+      [
+        1,
+        "0x83a"
+      ]
     ]
   }
 }
 ```
 ### Use an base address offset (WIP)
-```
+```test
 $ line2addr.py -b binaries/test -a 0x400000 -f binaries/test.c
   1          #include <unistd.h>
   2          #include <stdio.h>
   3          #include <string.h>
   4          int x[100];
   5   40078a int main(int argc, char **argv) {
-      400799
+      400799 
   6              char bob[10];
   7   4007a8     memset(bob,0,sizeof(bob));
   8   4007be     read(0, bob, 9);
@@ -91,41 +124,40 @@ $ line2addr.py -b binaries/test -a 0x400000 -f binaries/test.c
  13              }
  14   400807     printf("%s", bob);
  15   400824 }
-      40083a
-
+      40083a 
 ```
 ### Use a base directory and display all files
-```
-$ ./line2addr.py -d binaries/ -b binaries/test2
+```test
+$ line2addr.py -d binaries/ -b binaries/test2
 binaries/dirtest/test.c:
   1          #include "test2.h"
   2          
   3      64a int main() {
   4      64e     g(3);
   5      65d }
-         65f
+         65f 
 binaries/dirtest/test2.c:
   1          #include <stdio.h>
   2      65f int g(int x) {
   3      66a     printf("%d\n", x);
   4      680 }
-         683
+         683 
 ```
 
 ### See additional DWARF information
-```
+```test
 $ line2addr.py -b binaries/test2 -d ./binaries/ --dwarf
 ./binaries/dirtest/test.c:
   1              #include "test2.h"
-  2
+  2              
   3  20      64a int main() {
   4  75      64e     g(3);
   5 229      65d }
-      1      65f
+      1      65f 
 ./binaries/dirtest/test2.c:
   1              #include <stdio.h>
   2  19      65f int g(int x) {
   3 173      66a     printf("%d\n", x);
   4  89      680 }
-      1      683
+      1      683 
 ```
