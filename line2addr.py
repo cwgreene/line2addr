@@ -43,7 +43,7 @@ def display_file_line(filename, lineno, lines):
     bf = os.path.basename(filename)
     reffile = referenced_files.get(bf, None)
     if reffile:
-        for addr in lines[reffile][lineno]:
+        for line, addr in lines[reffile][lineno]:
             print(hex(addr))
     else:
         print("{} is not references in the executable".format(filename))
@@ -71,6 +71,8 @@ def resolve_file(dirname, basename, lookup):
     reference_list = lookup[basename]
     dirname_path = os.path.split(dirname)
     matches = [(os.path.split(match[0]), match[0], match[1]) for match in reference_list]
+    if len(matches) == 1:
+        return (matches[0][1], matches[0][2])
     while matches:
         matches = [(os.path.split(match[0][0]), match[1], match[2]) for match in matches
             if os.path.normpath(match[0][-1]) == os.path.normpath(dirname_path[-1])]
